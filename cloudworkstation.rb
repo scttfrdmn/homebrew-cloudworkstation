@@ -1,6 +1,7 @@
 class Cloudworkstation < Formula
   desc "Launch cloud research environments in seconds"
   homepage "https://github.com/scttfrdmn/cloudworkstation"
+  version "0.4.1"
   license "MIT"
   head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
 
@@ -23,8 +24,6 @@ class Cloudworkstation < Formula
     end
   end
 
-  version "0.4.1"
-
   depends_on "go" => :build
 
   def install
@@ -43,19 +42,19 @@ class Cloudworkstation < Formula
 
   def post_install
     # Ensure configuration directory exists
-    system "mkdir", "-p", "#{ENV["HOME"]}/.cloudworkstation"
+    mkdir_p "#{Dir.home}/.cloudworkstation"
   end
 
   def caveats
     <<~EOS
       CloudWorkstation #{version} has been installed!
-      
+
       To start the CloudWorkstation daemon:
         cwsd start
-        
+
       To launch your first cloud workstation:
         cws launch python-research my-project
-        
+
       For full documentation:
         cws help
     EOS
