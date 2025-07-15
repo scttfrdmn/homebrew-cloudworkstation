@@ -42,12 +42,12 @@ class Cloudworkstation < Formula
 
   def post_install
     # Ensure configuration directory exists
-    mkdir_p "#{Dir.home}/.cloudworkstation"
+    mkdir_p "\#{Dir.home}/.cloudworkstation"
   end
 
   def caveats
     <<~EOS
-      CloudWorkstation #{version} has been installed!
+      CloudWorkstation \#{version} has been installed!
 
       To start the CloudWorkstation daemon:
         cwsd start
@@ -62,7 +62,8 @@ class Cloudworkstation < Formula
 
   test do
     # Check if binaries can run and report version
-    assert_match "CloudWorkstation v#{version}", shell_output("#{bin}/cws --version")
-    assert_match "CloudWorkstation Daemon v#{version}", shell_output("#{bin}/cwsd --version")
+    assert_match "CloudWorkstation v\#{version}", shell_output("\#{bin}/cws --version")
+    assert_match "CloudWorkstation Daemon v\#{version}", shell_output("\#{bin}/cwsd --version")
   end
 end
+
