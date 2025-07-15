@@ -66,4 +66,3 @@ class Cloudworkstation < Formula
     assert_match "CloudWorkstation Daemon v\#{version}", shell_output("\#{bin}/cwsd --version")
   end
 end
-
