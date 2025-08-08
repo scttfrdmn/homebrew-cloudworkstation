@@ -1,68 +1,84 @@
 class Cloudworkstation < Formula
-  desc "Launch cloud research environments in seconds"
+  desc "CLI tool for launching pre-configured cloud workstations for academic research"
   homepage "https://github.com/scttfrdmn/cloudworkstation"
-  version "0.4.1"
+  url "https://github.com/scttfrdmn/cloudworkstation/archive/v0.4.1.tar.gz"
+  sha256 "e4ac4cc646dcedf2df172877db473f091d9f694ffc28912a5a1dc8b738233545"
   license "MIT"
-  head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
-
-  # This stanza checks the latest release from GitHub
-  if OS.mac?
-    if Hardware::CPU.arm?
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.1/cloudworkstation-darwin-arm64.tar.gz"
-      sha256 "c8b90aafd1ce01e94c14343d37e5a4f83af3d6bde1df10f093ea541cd3fe2883"
-    else
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.1/cloudworkstation-darwin-amd64.tar.gz"
-      sha256 "861c2b9c9cd7c8a0eb23d382faf1af0886721a4ef8aeefc706a2ca0515e8cc05"
-    end
-  elsif OS.linux?
-    if Hardware::CPU.arm?
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.1/cloudworkstation-linux-arm64.tar.gz"
-      sha256 "53444f8a598b8aeeff90b21055f1cd54e0c2f695d138951ff518c7635582b015"
-    else
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.1/cloudworkstation-linux-amd64.tar.gz"
-      sha256 "388a0be69f43ba375e295f7ee73f591f79d864516ec4ba9f1b64f67993f4e17b"
-    end
-  end
+  version "0.4.1"
 
   depends_on "go" => :build
 
   def install
-    # Install binary from the archive
-    bin.install "cws"
-    bin.install "cwsd"
-
-    # Install completion scripts
-    bash_completion.install "completions/cws.bash" => "cws"
-    zsh_completion.install "completions/cws.zsh" => "_cws"
-    fish_completion.install "completions/cws.fish"
-
-    # Install man pages if available
-    man1.install "man/cws.1" if File.exist?("man/cws.1")
-  end
-
-  def post_install
-    # Ensure configuration directory exists
-    mkdir_p "\#{Dir.home}/.cloudworkstation"
+    # Ensure dependencies are up to date
+    system "go", "mod", "tidy"
+    
+    # Build all binaries
+    system "make", "build"
+    
+    # Install binaries
+    bin.install "bin/cws"
+    bin.install "bin/cwsd" 
+    bin.install "bin/cws-gui"
+    
+    # Install documentation
+    doc.install "README.md"
+    doc.install "CLAUDE.md"
+    doc.install "CHANGELOG.md"
+    
+    # Install templates
+    share.install "templates"
+    
+    # Install man pages if they exist
+    man1.install Dir["docs/man/*.1"] if Dir.exist?("docs/man")
   end
 
   def caveats
     <<~EOS
-      CloudWorkstation \#{version} has been installed!
-
-      To start the CloudWorkstation daemon:
-        cwsd start
-
-      To launch your first cloud workstation:
-        cws launch python-research my-project
-
-      For full documentation:
-        cws help
+      CloudWorkstation has been installed with three interfaces:
+      
+      Command Line Interface (CLI):
+        cws --help
+      
+      Terminal User Interface (TUI):
+        cws tui
+      
+      Graphical User Interface (GUI):
+        cws-gui
+      
+      To get started:
+        cws templates
+        cws launch <template-name> <instance-name>
+      
+      The daemon (cwsd) will start automatically when needed.
+      You can also start it manually or as a service.
+      
+      AWS credentials are required. Set them up with:
+        aws configure
+      
+      For more information:
+        https://github.com/scttfrdmn/cloudworkstation
     EOS
   end
 
   test do
-    # Check if binaries can run and report version
-    assert_match "CloudWorkstation v\#{version}", shell_output("\#{bin}/cws --version")
-    assert_match "CloudWorkstation Daemon v\#{version}", shell_output("\#{bin}/cwsd --version")
+    # Test that binaries exist and are executable
+    assert_predicate bin/"cws", :exist?
+    assert_predicate bin/"cwsd", :exist?  
+    assert_predicate bin/"cws-gui", :exist?
+    
+    # Test version command
+    output = shell_output("#{bin}/cws version 2>&1", 0)
+    assert_match "CloudWorkstation v#{version}", output
+    
+    # Test templates command (should work without AWS credentials)
+    system "#{bin}/cws", "templates"
+  end
+
+  service do
+    run [opt_bin/"cwsd"]
+    keep_alive true
+    log_path var/"log/cloudworkstation/cwsd.log"
+    error_log_path var/"log/cloudworkstation/cwsd.log"
+    working_dir HOMEBREW_PREFIX
   end
 end
