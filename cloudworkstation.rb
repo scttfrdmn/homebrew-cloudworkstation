@@ -3,9 +3,8 @@ class Cloudworkstation < Formula
   homepage "https://github.com/scttfrdmn/cloudworkstation"
   version "0.4.2"
   license "MIT"
-  head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
 
-  # This stanza checks the latest release from GitHub
+  # Use pre-built binaries from GitHub releases
   if OS.mac?
     if Hardware::CPU.arm?
       url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2/cloudworkstation-darwin-arm64.tar.gz"
@@ -24,17 +23,17 @@ class Cloudworkstation < Formula
     end
   end
 
-  depends_on "go" => :build
-
   def install
-    # Install binary from the archive
+    # Install pre-built binaries from the archive
     bin.install "cws"
     bin.install "cwsd"
 
-    # Install completion scripts
-    bash_completion.install "completions/cws.bash" => "cws"
-    zsh_completion.install "completions/cws.zsh" => "_cws"
-    fish_completion.install "completions/cws.fish"
+    # Install completion scripts if available
+    if Dir.exist?("completions")
+      bash_completion.install "completions/cws.bash" => "cws" if File.exist?("completions/cws.bash")
+      zsh_completion.install "completions/cws.zsh" => "_cws" if File.exist?("completions/cws.zsh")
+      fish_completion.install "completions/cws.fish" if File.exist?("completions/cws.fish")
+    end
 
     # Install man pages if available
     man1.install "man/cws.1" if File.exist?("man/cws.1")
