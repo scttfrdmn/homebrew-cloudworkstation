@@ -27,6 +27,10 @@ class Cloudworkstation < Formula
     # Install pre-built binaries from the archive
     bin.install "cws"
     bin.install "cwsd"
+    
+    # Ensure binaries are executable
+    chmod 0755, bin/"cws"
+    chmod 0755, bin/"cwsd"
 
     # Install completion scripts if available
     if Dir.exist?("completions")
