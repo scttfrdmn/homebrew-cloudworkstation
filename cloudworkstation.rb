@@ -25,12 +25,24 @@ class Cloudworkstation < Formula
 
   def install
     # Install pre-built binaries from the archive
-    bin.install "cws"
-    bin.install "cwsd"
-    
-    # Ensure binaries are executable
-    chmod 0755, bin/"cws"
-    chmod 0755, bin/"cwsd"
+    # Binaries are in platform-specific subdirectories
+    if OS.mac?
+      if Hardware::CPU.arm?
+        bin.install "darwin-arm64/cws"
+        bin.install "darwin-arm64/cwsd"
+      else
+        bin.install "darwin-amd64/cws"
+        bin.install "darwin-amd64/cwsd"
+      end
+    elsif OS.linux?
+      if Hardware::CPU.arm?
+        bin.install "linux-arm64/cws"
+        bin.install "linux-arm64/cwsd"
+      else
+        bin.install "linux-amd64/cws"
+        bin.install "linux-amd64/cwsd"
+      end
+    end
 
     # Install completion scripts if available
     if Dir.exist?("completions")
@@ -45,12 +57,12 @@ class Cloudworkstation < Formula
 
   def post_install
     # Ensure configuration directory exists
-    mkdir_p "\#{Dir.home}/.cloudworkstation"
+    system "mkdir", "-p", "#{Dir.home}/.cloudworkstation"
   end
 
   def caveats
     <<~EOS
-      CloudWorkstation \#{version} has been installed!
+      CloudWorkstation #{version} has been installed!
 
       To start the CloudWorkstation daemon:
         cwsd start
@@ -65,7 +77,7 @@ class Cloudworkstation < Formula
 
   test do
     # Check if binaries can run and report version
-    assert_match "CloudWorkstation v\#{version}", shell_output("\#{bin}/cws --version")
-    assert_match "CloudWorkstation Daemon v\#{version}", shell_output("\#{bin}/cwsd --version")
+    assert_match "CloudWorkstation v#{version}", shell_output("#{bin}/cws --version")
+    assert_match "CloudWorkstation Daemon v#{version}", shell_output("#{bin}/cwsd --version")
   end
 end
