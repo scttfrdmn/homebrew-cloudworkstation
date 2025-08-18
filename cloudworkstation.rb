@@ -4,16 +4,16 @@ class Cloudworkstation < Formula
   license "MIT"
   head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
   
-  version "0.4.2"
+  version "0.4.2-1"
 
   # Use prebuilt binaries for faster installation  
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2/cloudworkstation-darwin-arm64.tar.gz"
-      sha256 "831792e74d5d80325e14d3ad0d73600074958170d5deadf3159e332a6cd789f7"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2-1/cloudworkstation-darwin-arm64.tar.gz"
+      sha256 "0c8bef5b589d4e92c7aa1bd4ffb7858847a987fff2bdc769e223358dcfff4755"
     else
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2/cloudworkstation-darwin-amd64.tar.gz"
-      sha256 "ef8be5312ba9c4b9848b6e223a7fead762449249f5db0315e888adbb2d1685ba"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2-1/cloudworkstation-darwin-amd64.tar.gz"
+      sha256 "4867dcc52e37788975dde2219ffe06bcc7f60cb347d2d571207640541bd376ce"
     end
   end
 
@@ -21,11 +21,18 @@ class Cloudworkstation < Formula
     # Install prebuilt binaries directly from working directory
     bin.install "cws"
     bin.install "cwsd"
+    
+    # Install service management files
+    pkgshare.install "scripts/macos-service-manager.sh"
+    pkgshare.install "scripts/com.cloudworkstation.daemon.plist"
   end
 
   def post_install
     # Ensure configuration directory exists
     system "mkdir", "-p", "#{ENV["HOME"]}/.cloudworkstation"
+    
+    # Create log directory for service
+    system "mkdir", "-p", "#{ENV["HOME"]}/Library/Logs/cloudworkstation"
   end
 
   def caveats
@@ -56,12 +63,97 @@ class Cloudworkstation < Formula
         cws templates               # List available templates
         cws daemon status           # Check daemon status
         
-      🔧 Service Management:
-        brew services start cloudworkstation   # Auto-start daemon
+      🔧 Service Management (Auto-Start on Boot):
+        brew services start cloudworkstation   # Auto-start daemon with Homebrew
         brew services stop cloudworkstation    # Stop daemon service
+        brew services restart cloudworkstation # Restart daemon service
+        
+        # Alternative: Manual service management
+        #{HOMEBREW_PREFIX}/share/cloudworkstation/macos-service-manager.sh install   # Install service
+        #{HOMEBREW_PREFIX}/share/cloudworkstation/macos-service-manager.sh status    # Check status
+        #{HOMEBREW_PREFIX}/share/cloudworkstation/macos-service-manager.sh logs      # View logs
       
-      Note: Version 0.4.2 includes enterprise research features with prebuilt binaries for fast installation.
+      Note: Version 0.4.2-1 includes enterprise research features with prebuilt binaries for fast installation.
     EOS
+  end
+
+  def uninstall
+    # Stop Homebrew service if running
+    quiet_system("brew", "services", "stop", "cloudworkstation") if which("brew")
+    
+    # Attempt graceful daemon shutdown via API
+    if File.exist?("#{bin}/cws")
+      puts "🛑 Attempting graceful daemon shutdown..."
+      system("#{bin}/cws", "daemon", "stop")
+      sleep 2
+    end
+    
+    # Find and terminate any remaining daemon processes
+    puts "🔍 Checking for remaining daemon processes..."
+    daemon_pids = `pgrep -f cwsd 2>/dev/null || true`.strip.split("\n")
+    
+    unless daemon_pids.empty?
+      puts "⚠️  Found #{daemon_pids.length} daemon processes, terminating..."
+      daemon_pids.each do |pid|
+        next if pid.strip.empty?
+        puts "  Stopping PID #{pid}"
+        # Try graceful termination first
+        system("kill", "-TERM", pid.strip)
+      end
+      
+      sleep 3
+      
+      # Force kill any remaining processes
+      remaining_pids = `pgrep -f cwsd 2>/dev/null || true`.strip.split("\n")
+      unless remaining_pids.empty?
+        puts "🔨 Force killing remaining processes..."
+        remaining_pids.each do |pid|
+          next if pid.strip.empty?
+          puts "  Force killing PID #{pid}"
+          system("kill", "-KILL", pid.strip)
+        end
+      end
+    end
+    
+    # Clean up configuration and data files
+    puts "🧹 Cleaning up CloudWorkstation files..."
+    
+    config_dir = "#{ENV['HOME']}/.cloudworkstation"
+    if Dir.exist?(config_dir)
+      puts "  Removing config directory: #{config_dir}"
+      rm_rf(config_dir)
+    end
+    
+    # Clean up log files
+    log_dir = "#{ENV['HOME']}/Library/Logs/cloudworkstation"
+    if Dir.exist?(log_dir)
+      puts "  Removing log directory: #{log_dir}"
+      rm_rf(log_dir)
+    end
+    
+    # Remove Homebrew service files
+    service_file = "#{ENV['HOME']}/Library/LaunchAgents/homebrew.mxcl.cloudworkstation.plist"
+    if File.exist?(service_file)
+      puts "  Removing service file: #{service_file}"
+      rm_f(service_file)
+    end
+    
+    # Clean up any remaining state files
+    [
+      "#{ENV['HOME']}/.cloudworkstation",
+      "/tmp/cloudworkstation*",
+      "/var/tmp/cloudworkstation*"
+    ].each do |pattern|
+      Dir.glob(pattern).each do |path|
+        puts "  Removing: #{path}"
+        rm_rf(path) if File.exist?(path)
+      end
+    end
+    
+    puts "✅ CloudWorkstation uninstallation completed"
+    puts ""
+    puts "Note: AWS credentials and profiles remain unchanged."
+    puts "If you want to remove AWS credentials, run: aws configure"
   end
 
   test do
