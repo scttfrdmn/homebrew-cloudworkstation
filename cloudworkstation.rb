@@ -4,16 +4,16 @@ class Cloudworkstation < Formula
   license "MIT"
   head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
   
-  version "0.4.2-1"
+  version "0.4.2-2"
 
   # Use prebuilt binaries for faster installation  
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2-1/cloudworkstation-darwin-arm64.tar.gz"
-      sha256 "0c8bef5b589d4e92c7aa1bd4ffb7858847a987fff2bdc769e223358dcfff4755"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2-2/cloudworkstation-darwin-arm64.tar.gz"
+      sha256 "f317aa144d7416d154b75b9f97696b7ac9d179ad499d8e5bcdaa485ad0625a03"
     else
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2-1/cloudworkstation-darwin-amd64.tar.gz"
-      sha256 "4867dcc52e37788975dde2219ffe06bcc7f60cb347d2d571207640541bd376ce"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.2-2/cloudworkstation-darwin-amd64.tar.gz"
+      sha256 "de39fdc8a6148f56ef9df1d2b09c62a6bea9d24cec7f2d03401286262f358d6a"
     end
   end
 
@@ -61,7 +61,7 @@ class Cloudworkstation < Formula
         brew services stop cloudworkstation    # Stop daemon service
         brew services restart cloudworkstation # Restart daemon service
       
-      Note: Version 0.4.2-1 includes enterprise research features with prebuilt binaries for fast installation.
+      Note: Version 0.4.2-2 includes enterprise research features with prebuilt binaries for fast installation.
     EOS
   end
 
