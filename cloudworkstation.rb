@@ -26,9 +26,6 @@ class Cloudworkstation < Formula
   def post_install
     # Ensure configuration directory exists
     system "mkdir", "-p", "#{ENV["HOME"]}/.cloudworkstation"
-    
-    # Create log directory for service
-    system "mkdir", "-p", "#{ENV["HOME"]}/Library/Logs/cloudworkstation"
   end
 
   def caveats
