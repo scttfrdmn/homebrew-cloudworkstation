@@ -21,10 +21,6 @@ class Cloudworkstation < Formula
     # Install prebuilt binaries directly from working directory
     bin.install "cws"
     bin.install "cwsd"
-    
-    # Install service management files
-    pkgshare.install "scripts/macos-service-manager.sh"
-    pkgshare.install "scripts/com.cloudworkstation.daemon.plist"
   end
 
   def post_install
@@ -67,11 +63,6 @@ class Cloudworkstation < Formula
         brew services start cloudworkstation   # Auto-start daemon with Homebrew
         brew services stop cloudworkstation    # Stop daemon service
         brew services restart cloudworkstation # Restart daemon service
-        
-        # Alternative: Manual service management
-        #{HOMEBREW_PREFIX}/share/cloudworkstation/macos-service-manager.sh install   # Install service
-        #{HOMEBREW_PREFIX}/share/cloudworkstation/macos-service-manager.sh status    # Check status
-        #{HOMEBREW_PREFIX}/share/cloudworkstation/macos-service-manager.sh logs      # View logs
       
       Note: Version 0.4.2-1 includes enterprise research features with prebuilt binaries for fast installation.
     EOS
