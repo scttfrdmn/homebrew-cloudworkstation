@@ -156,8 +156,8 @@ class Cloudworkstation < Formula
     assert_predicate bin/"cwsd", :exist?
     
     # Test version command
-    assert_match "CloudWorkstation v", shell_output("#{bin}/cws --version")
-    assert_match "CloudWorkstation v", shell_output("#{bin}/cwsd --version")
+    assert_match "CloudWorkstation CLI v", shell_output("#{bin}/cws --version")
+    assert_match "CloudWorkstation Daemon v", shell_output("#{bin}/cwsd --version")
   end
 
   service do
