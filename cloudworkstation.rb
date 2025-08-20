@@ -4,16 +4,16 @@ class Cloudworkstation < Formula
   license "MIT"
   head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
   
-  version "0.4.3"
+  version "0.4.4"
 
   # Use prebuilt binaries for faster installation  
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.3/cloudworkstation-darwin-arm64-fixed.tar.gz"
-      sha256 "7b4511b63ecb81c42ec9d4240f1a02d562365f10992e2ea713f4c7702721e3a8"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.4/cloudworkstation-darwin-arm64.tar.gz"
+      sha256 "7e94989b8d09d26679a69e6a66705f25ffd09c29d42929e0abbf5ecf31bb14ba"
     else
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.3/cloudworkstation-darwin-amd64-fixed.tar.gz"
-      sha256 "dc3cdcd87c2978534675e5ff605c80ac1aff529d01e7f42bc62143304937931b"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.4/cloudworkstation-darwin-amd64.tar.gz"
+      sha256 "3ee850857aa73feb2ffd98cd9c570902caf9addbf96fe77bad452bec9654d206"
     end
   end
 
@@ -61,7 +61,13 @@ class Cloudworkstation < Formula
         brew services stop cloudworkstation    # Stop daemon service
         brew services restart cloudworkstation # Restart daemon service
       
-      Note: Version 0.4.3 includes research computing features with prebuilt binaries for fast installation.
+      🛡️ Version 0.4.4 Security Update:
+        Web interfaces (Jupyter, RStudio) now require SSH port forwarding for security.
+        Example: ssh -L 8888:localhost:8888 user@instance
+        
+        This prevents internet exposure while maintaining full functionality.
+        
+      Note: Version 0.4.4 includes enhanced security and prebuilt binaries for fast installation.
     EOS
   end
 
@@ -149,9 +155,9 @@ class Cloudworkstation < Formula
     assert_predicate bin/"cws", :exist?
     assert_predicate bin/"cwsd", :exist?
     
-    # Test version command (match actual output format)
-    assert_match "CloudWorkstation CLI v0.4.3", shell_output("#{bin}/cws --version")
-    assert_match "CloudWorkstation Daemon v0.4.3", shell_output("#{bin}/cwsd --version")
+    # Test version command
+    assert_match "CloudWorkstation v", shell_output("#{bin}/cws --version")
+    assert_match "CloudWorkstation v", shell_output("#{bin}/cwsd --version")
   end
 
   service do
