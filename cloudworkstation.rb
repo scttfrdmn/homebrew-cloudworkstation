@@ -3,17 +3,17 @@ class Cloudworkstation < Formula
   homepage "https://github.com/scttfrdmn/cloudworkstation"
   license "MIT"
   head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
-  
-  version "0.4.5"
 
-  # Use prebuilt binaries for faster installation  
+  version "0.4.6"
+
+  # Use prebuilt binaries for faster installation
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.5/cloudworkstation-darwin-arm64.tar.gz"
-      sha256 "ccf099630fbb5ee6a38ca2c0ddb62a07913d848f238fea4cf275e60020e6dda3"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.6/cloudworkstation-v0.4.6-darwin-arm64.tar.gz"
+      sha256 "5d8a11d9031cbdbd65e937034c3d50151fe49976cd2b8a631c2e68b74b93f0e8"
     else
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.5/cloudworkstation-darwin-amd64.tar.gz"
-      sha256 "6e87142a691b3de372fec2c93289a7cf0744b8a8b65a92cc920bf0ffd9aa5db2"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.6/cloudworkstation-v0.4.6-darwin-amd64.tar.gz"
+      sha256 "8171765b3ce9dc0c4305dcf88b277d95db092cd3f8c1928449fab9753a22279d"
     end
   end
 
@@ -22,7 +22,7 @@ class Cloudworkstation < Formula
     bin.install "cws"
     bin.install "cwsd"
     
-    # Note: Templates are bundled in the binaries for v0.4.5
+    # Note: Templates are bundled in the binaries for v0.4.6
   end
 
   def post_install
@@ -63,13 +63,18 @@ class Cloudworkstation < Formula
         brew services stop cloudworkstation    # Stop daemon service
         brew services restart cloudworkstation # Restart daemon service
       
-      🛡️ Version 0.4.4 Security Update:
-        Web interfaces (Jupyter, RStudio) now require SSH port forwarding for security.
-        Example: ssh -L 8888:localhost:8888 user@instance
-        
-        This prevents internet exposure while maintaining full functionality.
-        
-      Note: Version 0.4.4 includes enhanced security and prebuilt binaries for fast installation.
+      🎨 Version 0.4.6 EFS Multi-Modal Integration:
+        • Complete EFS volume management across CLI, TUI, and GUI interfaces
+        • Multi-instance file sharing for collaborative research environments
+        • Professional Cloudscape-based GUI with real-time mount status
+        • Interactive TUI with tabbed navigation and keyboard-driven operations
+
+        Example EFS usage:
+          cws volumes list                    # List EFS volumes
+          cws volumes mount shared-data my-instance  # Mount volume to instance
+          cws tui                            # Access storage tab (Press 4)
+
+      Note: Version 0.4.6 completes Phase 4 enterprise research platform features.
     EOS
   end
 
