@@ -4,16 +4,16 @@ class Cloudworkstation < Formula
   license "MIT"
   head "https://github.com/scttfrdmn/cloudworkstation.git", branch: "main"
 
-  version "0.4.6"
+  version "0.5.2"
 
   # Use prebuilt binaries for faster installation
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.6/cloudworkstation-v0.4.6-darwin-arm64.tar.gz"
-      sha256 "5d8a11d9031cbdbd65e937034c3d50151fe49976cd2b8a631c2e68b74b93f0e8"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.5.2/cloudworkstation-v0.5.2-darwin-arm64.tar.gz"
+      sha256 "49c8f35172b769506c035dcd5feb33afd29c9f311a65917e3b8dc57866f0947a"
     else
-      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.4.6/cloudworkstation-v0.4.6-darwin-amd64.tar.gz"
-      sha256 "8171765b3ce9dc0c4305dcf88b277d95db092cd3f8c1928449fab9753a22279d"
+      url "https://github.com/scttfrdmn/cloudworkstation/releases/download/v0.5.2/cloudworkstation-v0.5.2-darwin-amd64.tar.gz"
+      sha256 "17fc771d39599e2a5c75a3490c4a5571b0f9554499de71a6f2953da996fb02da"
     end
   end
 
@@ -63,18 +63,19 @@ class Cloudworkstation < Formula
         brew services stop cloudworkstation    # Stop daemon service
         brew services restart cloudworkstation # Restart daemon service
       
-      🎨 Version 0.4.6 EFS Multi-Modal Integration:
-        • Complete EFS volume management across CLI, TUI, and GUI interfaces
-        • Multi-instance file sharing for collaborative research environments
-        • Professional Cloudscape-based GUI with real-time mount status
-        • Interactive TUI with tabbed navigation and keyboard-driven operations
+      🎨 Version 0.5.2 SSH Tunnel & RStudio Authentication:
+        • SSH tunnel KeyName-based discovery (fixes Permission denied errors)
+        • RStudio Server automatic authentication (default: rstats/rstudio)
+        • AWS Systems Manager (SSM) agent on all Ubuntu instances
+        • GUI Terminal component with xterm.js integration
+        • Enhanced web service access with embedded browser
 
-        Example EFS usage:
-          cws volumes list                    # List EFS volumes
-          cws volumes mount shared-data my-instance  # Mount volume to instance
-          cws tui                            # Access storage tab (Press 4)
+        Example web service access:
+          cws web list my-instance           # List available web services
+          cws web open my-instance rstudio-server  # Open RStudio in browser
+          cws templates info r-research      # See RStudio template details
 
-      Note: Version 0.4.6 completes Phase 4 enterprise research platform features.
+      Note: Version 0.5.2 improves web-based research tool accessibility.
     EOS
   end
 
